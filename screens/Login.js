@@ -12,11 +12,11 @@ import {
 
 export default function Login() {
   const navigation = useNavigation();
-  const [cpf, setCpf] = useState("");
-  const [password, setPassword] = useState("");
+  const [cpf, setCpf] = useState("1234567");
+  const [password, setPassword] = useState("123456");
 
   const fetchLogin = async () => {
-    const requests = await fetch("http:/10.10.4.161:3000/api/login", {
+    const requests = await fetch("http://10.10.4.161:3000/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,11 +44,13 @@ export default function Login() {
         style={[styles.input, styles.bold]}
         onChangeText={(e) => setCpf(e)}
         placeholder="DIGITE SEU DOCUMENTO CPF"
+        value={cpf}
       />
       <TextInput
         style={[styles.input, styles.bold]}
         onChangeText={(e) => setPassword(e)}
         secureTextEntry={true}
+        value={password}
         placeholder="DIGITE SUA SENHA"
       />
       <View style={styles.lowerForm}>
