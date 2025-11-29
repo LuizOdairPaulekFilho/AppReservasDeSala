@@ -8,6 +8,5 @@ export function getUserID(){
 
 export function getJWToken(){
      const jwt = SecureStore.getItem("userToken");
-
      return jwt
 }

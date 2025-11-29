@@ -1,10 +1,21 @@
-import { Pressable, StyleSheet, Text, TextInput, View, Platform } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Platform,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../components/Header";
 import { useEffect, useState } from "react";
-import { getJWToken, getUserID } from "../utils/decodeJwt";
+import { getUserID } from "../utils/decodeJwt";
 import { Dropdown } from "../components/DropDown";
-import RNDateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import RNDateTimePicker, {
+  DateTimePickerAndroid,
+} from "@react-native-community/datetimepicker";
+import { apiGet, apiPost } from "../utils/apiRequests";
 
 export default function CadastrarReserva() {
   const [responsavel, setResponsavel] = useState();
@@ -13,35 +24,26 @@ export default function CadastrarReserva() {
   const [hour, setHour] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-
-
-  async function fetchCadastro(){
-    
-  }
+  const [salas, setSalas] = useState([]);
+  const [selectedSala, setSelectedSala] = useState(null);
+  const [tema, setTema] = useState("");
 
   useEffect(() => {
     const getUserData = async () => {
-      const token = getJWToken();
-      console.log("token =>", token);
-      const requests = await fetch(
-        "http://10.10.4.161:3000/api/usuarios/" + getUserID(),
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const dados = await requests.json();
-      
-      console.log(dados);
+      const dados = await apiGet("/api/usuarios/" + getUserID());
       setResponsavel(dados.nome);
       setSetor(dados.Setor.nome);
     };
 
+    const getRooms = async () => {
+      const dados = await apiGet("/api/salas/");
+      setSalas(dados);
+    };
+
+    getRooms();
     getUserData();
   }, []);
 
-  // Para Android - usando DateTimePickerAndroid
   const showDatePickerAndroid = () => {
     DateTimePickerAndroid.open({
       value: date,
@@ -50,8 +52,8 @@ export default function CadastrarReserva() {
           setDate(selectedDate);
         }
       },
-      mode: 'date',
-      display: 'default',
+      mode: "date",
+      display: "default",
     });
   };
 
@@ -63,12 +65,11 @@ export default function CadastrarReserva() {
           setHour(selectedDate);
         }
       },
-      mode: 'time',
-      display: 'default',
+      mode: "time",
+      display: "default",
     });
   };
 
-  // Para iOS - usando state para controlar visibilidade
   const onChangeDate = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
@@ -84,7 +85,7 @@ export default function CadastrarReserva() {
   };
 
   const showDatePickerModal = () => {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === "android") {
       showDatePickerAndroid();
     } else {
       setShowDatePicker(true);
@@ -92,69 +93,140 @@ export default function CadastrarReserva() {
   };
 
   const showTimePickerModal = () => {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === "android") {
       showTimePickerAndroid();
     } else {
       setShowTimePicker(true);
     }
   };
 
-  const [value, setValue] = useState(null);
+  const fetchCadastro = async () => {
+    try {
+      // Validar campos obrigatórios
+      if (!selectedSala) {
+        Alert.alert("Erro", "Por favor, selecione uma sala");
+        return;
+      }
+
+    
+
+      // Combinar data e hora
+      const dataHora = new Date(date);
+      dataHora.setHours(hour.getHours());
+      dataHora.setMinutes(hour.getMinutes());
+      dataHora.setSeconds(0);
+      dataHora.setMilliseconds(0);
+
+      // Formatar data para ISO string
+      const inicio = dataHora.toISOString();
+
+      // Preparar dados para envio
+      const data = {
+        inicio: inicio,
+        SalaId: selectedSala.id, // Agora pega o ID corretamente
+        SetorId: 1, // Você pode precisar ajustar isso
+        userId: getUserID(),
+        tema: tema
+      };
+
+
+      const dados = await apiPost("/api/reunioes/", data);
+      
+      Alert.alert("Sucesso", "Reserva cadastrada com sucesso!");
+      
+      // Limpar formulário após sucesso
+      setTema("");
+      setSelectedSala(null);
+      setDate(new Date());
+      setHour(new Date());
+
+    } catch (error) {
+      console.error("Erro ao cadastrar reserva:", error);
+      Alert.alert(
+        "Erro", 
+        error.response?.data?.erro || "Erro ao cadastrar reserva. Tente novamente."
+      );
+    }
+  };
+
+  // Função para lidar com a seleção da sala
+  const handleSalaSelect = (sala) => {
+    setSelectedSala(sala);
+  };
 
   return (
     <SafeAreaView>
       <Header title="Reservas Gerais"></Header>
       <View style={styles.container}>
         <Text>RESPONSÁVEL</Text>
-        <TextInput style={[styles.TextInput,{backgroundColor:"#b8b8b8ff"}]} value={responsavel} editable={false}></TextInput>
-        
+        <TextInput
+          style={[styles.TextInput, { backgroundColor: "#b8b8b8ff" }]}
+          value={responsavel}
+          editable={false}
+        ></TextInput>
+
         <Text>SETOR</Text>
-        <TextInput style={[styles.TextInput,{backgroundColor:"#b8b8b8ff"}]} value={setor} editable={false}></TextInput>
+        <TextInput
+          style={[styles.TextInput, { backgroundColor: "#b8b8b8ff" }]}
+          value={setor}
+          editable={false}
+        ></TextInput>
 
         <Text>SALA</Text>
-        <Dropdown options={[1,2,3]}></Dropdown>
+        <Dropdown 
+          options={salas} 
+          onSelect={handleSalaSelect}
+          selectedValue={selectedSala}
+        ></Dropdown>
+
+        {/* Mostrar sala selecionada para debug */}
+        {selectedSala && (
+          <Text style={styles.selectedSalaText}>
+            Sala selecionada: {selectedSala.n_sala} (Andar: {selectedSala.andar}) - ID: {selectedSala.id}
+          </Text>
+        )}
 
         <Text>DATA</Text>
         <Pressable onPress={showDatePickerModal} style={styles.dateButton}>
           <Text style={styles.dateButtonText}>
-            📅 {date.toLocaleDateString('pt-BR')}
+            📅 {date.toLocaleDateString("pt-BR")}
           </Text>
         </Pressable>
 
         <Text>HORÁRIO</Text>
         <Pressable onPress={showTimePickerModal} style={styles.dateButton}>
           <Text style={styles.dateButtonText}>
-            ⏰ {hour.toLocaleTimeString('pt-BR', { 
-              hour: '2-digit', 
-              minute: '2-digit' 
+            ⏰{" "}
+            {hour.toLocaleTimeString("pt-BR", {
+              hour: "2-digit",
+              minute: "2-digit",
             })}
           </Text>
         </Pressable>
 
         {/* Date Picker Modal para iOS */}
         {showDatePicker && (
-          <RNDateTimePicker 
-            mode="date" 
-            display="spinner" 
-            value={date} 
-            onChange={onChangeDate} 
+          <RNDateTimePicker
+            mode="date"
+            display="spinner"
+            value={date}
+            onChange={onChangeDate}
           />
         )}
 
         {/* Time Picker Modal para iOS */}
         {showTimePicker && (
-          <RNDateTimePicker 
-            mode="time" 
-            display="spinner" 
-            value={hour} 
-            onChange={onChangeTime} 
+          <RNDateTimePicker
+            mode="time"
+            display="spinner"
+            value={hour}
+            onChange={onChangeTime}
           />
         )}
 
-        <Text>TEMA</Text>
-        <TextInput style={styles.TextInput}></TextInput>
+       
 
-        <Pressable style={styles.button} onPress={fetch}>
+        <Pressable style={styles.button} onPress={fetchCadastro}>
           <Text style={styles.txtButton}>CADASTRAR RESERVA</Text>
         </Pressable>
       </View>
@@ -203,27 +275,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  dropdown: {
-    margin: 16,
-    height: 50,
-    borderBottomColor: 'gray',
-    borderBottomWidth: 0.5,
-  },
-  icon: {
-    marginRight: 5,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
+  selectedSalaText: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 5,
   },
 });

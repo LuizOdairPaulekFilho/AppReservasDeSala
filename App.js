@@ -1,6 +1,5 @@
 import { createStaticNavigation } from "@react-navigation/native";
 import Login from "./screens/Login";
-import Reservas from "./screens/Reservas";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import ReservasGerais from "./screens/ReservasGerais";
 import Reunioes from "./screens/Reunioes";
@@ -21,12 +20,6 @@ const RootStack = createDrawerNavigator({
         headerShown: false,
       },
     },
-    Reservas: {
-      screen: Reservas,
-      options: {
-        headerShown: false,
-      },
-    },
     MinhasReunioes: {
       screen: Reunioes,
       options: {
@@ -43,8 +36,6 @@ const RootStack = createDrawerNavigator({
 });
 
 const Navigation = createStaticNavigation(RootStack);
-//const Drawer = createDrawerNavigator();
-
 export default function App() {
   return <Navigation />;
 }

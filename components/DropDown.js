@@ -2,24 +2,29 @@ import Octicons from "@react-native-vector-icons/octicons";
 import { Pressable, Text, View } from "react-native";
 import { useState } from "react";
 
-export function Dropdown({ options }) {
+export function Dropdown({ options, onSelect, selectedValue }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [valor, setValor] = useState("SELECIONE");
 
   function toggleDropdown() {
     setIsOpen(!isOpen);
   }
 
+  const handleSelect = (sala) => {
+    onSelect(sala); // Passa o objeto sala completo para o componente pai
+    setIsOpen(false);
+  };
+
   return (
-    <View style={{ width: 100 }}>
+    <View style={{ width: "80%" }}>
       <Pressable
         onPress={toggleDropdown}
         style={{
           backgroundColor: "#ffffff",
-          padding: 8,
+          padding: 15,
           borderWidth: 1,
-          borderColor: "#ccc",
-          borderRadius: 4,
+          borderColor: "#000000",
+          borderRadius: 10,
+          width: "100%",
         }}
       >
         <View
@@ -29,7 +34,12 @@ export function Dropdown({ options }) {
             justifyContent: "space-between",
           }}
         >
-          <Text>{valor}</Text>
+          <Text style={{ color: "#000" }}>
+            {selectedValue 
+              ? `Andar: ${selectedValue.andar} | N: ${selectedValue.n_sala}`
+              : "SELECIONE UMA SALA"
+            }
+          </Text>
           <Octicons name="chevron-down" size={20} />
         </View>
       </Pressable>
@@ -40,27 +50,31 @@ export function Dropdown({ options }) {
             borderWidth: 1,
             borderColor: "#ccc",
             marginTop: 4,
-            borderRadius: 4,
+            borderRadius: 10,
             elevation: 2,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
             shadowRadius: 4,
             position: "absolute",
-            zIndex: 1,
+            top: 50,
+            width: "100%",
+            zIndex: 1000,
+            maxHeight: 200,
           }}
         >
-          {options.map((element, index) => (
+          {options.map((sala, index) => (
             <Pressable
-              key={index}
-              style={{ padding: 8 }}
-              onPress={() => {
-                setValor(options[index]);
-                setIsOpen(false);
+              key={sala.id}
+              style={{ 
+                padding: 12, 
+                borderBottomWidth: index < options.length - 1 ? 1 : 0,
+                borderBottomColor: "#f0f0f0"
               }}
+              onPress={() => handleSelect(sala)}
             >
               <Text style={{ color: "#000" }}>
-                Ardar: {element} | N: {element}
+                Andar: {sala.andar} | N: {sala.n_sala}
               </Text>
             </Pressable>
           ))}

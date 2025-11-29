@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { apiPost } from "../utils/apiRequests";
 
 export default function Login() {
   const navigation = useNavigation();
@@ -16,19 +17,11 @@ export default function Login() {
   const [password, setPassword] = useState("123456");
 
   const fetchLogin = async () => {
-    const requests = await fetch("http://10.10.4.161:3000/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ cpf: cpf, password: password }),
-    });
-    const data = await requests.json();
+    const data = await apiPost('/api/login',{cpf,password})
 
-    if (requests.status === 401) {
+    if (data.erro) {
       alert("Usuario e/ou senha invalidos");
     } else {
-      console.log(data.token);
         await SecureStore.setItemAsync('userToken',data.token);
         navigation.navigate("MinhasReunioes");
     }

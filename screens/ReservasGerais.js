@@ -1,171 +1,55 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Header from "../components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Octicons from "@react-native-vector-icons/octicons";
 import CardReuniaoGeral from "../components/CardReuniaoGeral";
 import StatusReunionEnum from "../enums/StatusReunionEnum";
 import Calendar from "../components/Calendar";
+import { useEffect, useState } from "react";
+import { apiGet } from "../utils/apiRequests";
 
 const ReservasGerais = () => {
+  const [reunioes, setReunioes] = useState([]);
+
+  useEffect(() => {
+    const getAllReunions = async () => {
+      const dados = await apiGet("/api/reunioes/");
+      setReunioes(dados);
+    };
+    getAllReunions();
+  }, []);
   return (
     <SafeAreaView>
       <ScrollView style={styles.container}>
         <Header title="Reservas Gerais"></Header>
         <Calendar></Calendar>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
-        <CardReuniaoGeral
-          andarNumber="5"
-          horario="12:00"
-          setor="VAREJO"
-          salaNumber="10"
-          status={StatusReunionEnum.finished}
-        ></CardReuniaoGeral>
+
+        {reunioes.map((element) => {
+          const dataReuniao = new Date(element.data_reuniao);
+          const horarioFormatado = dataReuniao.toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          const getStatus = (status) => {
+            const statusMap = {
+              cancelado: StatusReunionEnum.canceled,
+              "em andamento": StatusReunionEnum.inProgress,
+              pendente: StatusReunionEnum.pending,
+              finalizada: StatusReunionEnum.finished,
+            };
+            return statusMap[status] || StatusReunionEnum.pending;
+          };
+
+          return (
+            <CardReuniaoGeral
+              key={element.id}
+              andarNumber={element.Sala.andar}
+              horario={horarioFormatado}
+              setor={element.Setor.nome.toUpperCase()}
+              salaNumber={element.Sala.n_sala}
+              status={getStatus(element.status_reuniao)}
+            ></CardReuniaoGeral>
+          );
+        })}
       </ScrollView>
     </SafeAreaView>
   );

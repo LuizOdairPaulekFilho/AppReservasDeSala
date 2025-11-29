@@ -1,41 +1,69 @@
 import { PanResponder, StyleSheet, View } from "react-native";
 import CardCarousel from "./CardCaroseul";
 import { useRef, useState } from "react";
+import StatusReunionEnum from "../enums/StatusReunionEnum";
 
 export default function Carousel({ vector }) {
   const [keySelected, setKeySelected] = useState(0);
-  const startDy = useRef(0);
-  const threshold = 50; 
+
+  const threshold = 50;
+  const swipeDone = useRef(false); // controla uma troca por gesto
+
+  const getStatus = (status) => {
+    const statusMap = {
+      cancelado: StatusReunionEnum.canceled,
+      "em andamento": StatusReunionEnum.inProgress,
+      pendente: StatusReunionEnum.pending,
+      finalizada: StatusReunionEnum.finished,
+    };
+    return statusMap[status] || StatusReunionEnum.pending;
+  };
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (e, gestureState) => {
-        startDy.current = gestureState.dy; // guarda posição inicial
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return Math.abs(gestureState.dy) > 20;
       },
-      onPanResponderMove: (e, gestureState) => {
-        const diff = gestureState.dy - startDy.current;
-        if (diff > threshold) {
-          setKeySelected((prev) => Math.max(prev - 1, 0)); 
-          startDy.current = gestureState.dy; 
-        } else if (diff < -threshold) {
-          setKeySelected((prev) => Math.min(prev + 1, vector.length - 1));
-          startDy.current = gestureState.dy; 
+
+      onPanResponderGrant: () => {
+        swipeDone.current = false; // libera swipe no início do gesto
+      },
+
+      onPanResponderMove: (_, gestureState) => {
+        if (swipeDone.current) return; // já trocou neste gesto
+
+        if (gestureState.dy > threshold) {
+          swipe(-1); // sobe → item anterior
+          swipeDone.current = true;
+        } else if (gestureState.dy < -threshold) {
+          swipe(1); // desce → próximo item
+          swipeDone.current = true;
         }
       },
+
       onPanResponderRelease: () => {
-        startDy.current = 0; 
+        swipeDone.current = false; // libera próximo gesto
       },
     })
   ).current;
+
+  const swipe = (direction) => {
+    setKeySelected((prev) => {
+      const next = prev + direction;
+      if (next < 0 || next >= vector.length) return prev;
+      return next;
+    });
+  };
 
   return (
     <View style={styles.carousel} {...panResponder.panHandlers}>
       {vector.map((element, index) => {
         const diff = Math.abs(index - keySelected);
-        const visible = keySelected === index;
-        const width = `${90 - diff * 10}%`;
-        const height = `${55 - diff * 10}%`;
+        const visible = index === keySelected;
+
+        // Valores fixos para evitar bugs com %
+        const width = 320 - diff * 40;
+        const height = 220 - diff * 25;
 
         return (
           <CardCarousel
@@ -43,6 +71,9 @@ export default function Carousel({ vector }) {
             width={width}
             height={height}
             visible={visible}
+            setor={element.Setor.nome.toUpperCase()}
+            data={element.data_reuniao}
+            status={getStatus(element.status_reuniao)}
           />
         );
       })}
@@ -53,8 +84,8 @@ export default function Carousel({ vector }) {
 const styles = StyleSheet.create({
   carousel: {
     width: "100%",
-    height: "40%",
-    display: "flex",
+    flex: 1,
+    paddingTop: 20,
     alignItems: "center",
   },
 });
