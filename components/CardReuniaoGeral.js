@@ -3,8 +3,8 @@ import StatusReunionEnum from "../enums/StatusReunionEnum";
 
 const CardReuniaoGeral = ({setor, status, horario, salaNumber, andarNumber}) => {
   let color = "#FF0000";
-  if(status == StatusReunionEnum.finished) color = "#37c957ff";  
-  if(status == StatusReunionEnum.pending) color = "#e5ff00ff";  
+  if(status == "finalizado") color = "#37c957ff";  
+  if(status == "pendente") color = "#e5ff00ff";  
 
   return (
     <View style={styles.card}>

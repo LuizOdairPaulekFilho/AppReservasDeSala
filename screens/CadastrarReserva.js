@@ -102,54 +102,45 @@ export default function CadastrarReserva() {
 
   const fetchCadastro = async () => {
     try {
-      // Validar campos obrigatórios
       if (!selectedSala) {
         Alert.alert("Erro", "Por favor, selecione uma sala");
         return;
       }
 
-    
-
-      // Combinar data e hora
       const dataHora = new Date(date);
       dataHora.setHours(hour.getHours());
       dataHora.setMinutes(hour.getMinutes());
       dataHora.setSeconds(0);
       dataHora.setMilliseconds(0);
 
-      // Formatar data para ISO string
       const inicio = dataHora.toISOString();
 
-      // Preparar dados para envio
       const data = {
         inicio: inicio,
-        SalaId: selectedSala.id, // Agora pega o ID corretamente
-        SetorId: 1, // Você pode precisar ajustar isso
+        SalaId: selectedSala.id,
+        SetorId: 1,
         userId: getUserID(),
-        tema: tema
+        tema: tema,
       };
 
-
       const dados = await apiPost("/api/reunioes/", data);
-      
+
       Alert.alert("Sucesso", "Reserva cadastrada com sucesso!");
-      
-      // Limpar formulário após sucesso
+
       setTema("");
       setSelectedSala(null);
       setDate(new Date());
       setHour(new Date());
-
     } catch (error) {
       console.error("Erro ao cadastrar reserva:", error);
       Alert.alert(
-        "Erro", 
-        error.response?.data?.erro || "Erro ao cadastrar reserva. Tente novamente."
+        "Erro",
+        error.response?.data?.erro ||
+          "Erro ao cadastrar reserva. Tente novamente."
       );
     }
   };
 
-  // Função para lidar com a seleção da sala
   const handleSalaSelect = (sala) => {
     setSelectedSala(sala);
   };
@@ -173,16 +164,16 @@ export default function CadastrarReserva() {
         ></TextInput>
 
         <Text>SALA</Text>
-        <Dropdown 
-          options={salas} 
+        <Dropdown
+          options={salas}
           onSelect={handleSalaSelect}
           selectedValue={selectedSala}
         ></Dropdown>
 
-        {/* Mostrar sala selecionada para debug */}
         {selectedSala && (
           <Text style={styles.selectedSalaText}>
-            Sala selecionada: {selectedSala.n_sala} (Andar: {selectedSala.andar}) - ID: {selectedSala.id}
+            Sala selecionada: {selectedSala.n_sala} (Andar: {selectedSala.andar}
+            ) - ID: {selectedSala.id}
           </Text>
         )}
 
@@ -204,7 +195,6 @@ export default function CadastrarReserva() {
           </Text>
         </Pressable>
 
-        {/* Date Picker Modal para iOS */}
         {showDatePicker && (
           <RNDateTimePicker
             mode="date"
@@ -214,7 +204,6 @@ export default function CadastrarReserva() {
           />
         )}
 
-        {/* Time Picker Modal para iOS */}
         {showTimePicker && (
           <RNDateTimePicker
             mode="time"
@@ -223,8 +212,6 @@ export default function CadastrarReserva() {
             onChange={onChangeTime}
           />
         )}
-
-       
 
         <Pressable style={styles.button} onPress={fetchCadastro}>
           <Text style={styles.txtButton}>CADASTRAR RESERVA</Text>

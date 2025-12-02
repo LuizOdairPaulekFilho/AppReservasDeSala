@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, RefreshControl } from "react-native";
 import Header from "../components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CardReuniaoGeral from "../components/CardReuniaoGeral";
@@ -9,26 +9,45 @@ import { apiGet } from "../utils/apiRequests";
 
 const ReservasGerais = () => {
   const [reunioes, setReunioes] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const getAllReunions = async () => {
+    const dados = await apiGet("/api/reunioes/");
+    setReunioes(dados);
+  };
 
   useEffect(() => {
-    const getAllReunions = async () => {
-      const dados = await apiGet("/api/reunioes/");
-      setReunioes(dados);
-    };
     getAllReunions();
   }, []);
+
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getAllReunions();
+    setRefreshing(false);
+  };
+
   return (
-    <SafeAreaView>
-      <ScrollView style={styles.container}>
-        <Header title="Reservas Gerais"></Header>
-        <Calendar></Calendar>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <Header title="Reservas Gerais" />
+        <Calendar />
 
         {reunioes.map((element) => {
           const dataReuniao = new Date(element.data_reuniao);
           const horarioFormatado = dataReuniao.toLocaleTimeString("pt-BR", {
+            month: "2-digit",
+            day: "2-digit",
+            year: "2-digit",
             hour: "2-digit",
             minute: "2-digit",
           });
+
           const getStatus = (status) => {
             const statusMap = {
               cancelado: StatusReunionEnum.canceled,
@@ -46,8 +65,8 @@ const ReservasGerais = () => {
               horario={horarioFormatado}
               setor={element.Setor.nome.toUpperCase()}
               salaNumber={element.Sala.n_sala}
-              status={getStatus(element.status_reuniao)}
-            ></CardReuniaoGeral>
+              status={element.status_reuniao}
+            />
           );
         })}
       </ScrollView>
@@ -58,7 +77,7 @@ const ReservasGerais = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#B9D6F2",
-    height: "100%",
+    flex: 1,
   },
 });
 

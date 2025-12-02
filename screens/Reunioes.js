@@ -1,28 +1,46 @@
-import { Text, View } from "react-native";
+import { RefreshControl } from "react-native";
 import Header from "../components/Header";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Carousel from "../components/Caroseul";
 import FloatingActionButton from "../components/FloatingActionButton";
 import { useEffect, useState } from "react";
 import { apiGet } from "../utils/apiRequests";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 const Reunioes = () => {
   const [reunioes, setReunioes] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchReunioes = async () => {
+    const dados = await apiGet("/api/reunioes");
+    const pendentes = dados.filter((r) => r.status_reuniao === "pendente");
+    setReunioes(pendentes);
+  };
 
   useEffect(() => {
-    const getAllReunions = async () => {
-      const dados = await apiGet("/api/reunioes");
-      setReunioes(dados);
-    };
-    getAllReunions();
+    fetchReunioes();
   }, []);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchReunioes();
+    setRefreshing(false);
+  };
+
+  const handleDelete = (id) => {
+    setReunioes((prev) => prev.filter((item) => item.id !== id));
+  };
+
   return (
-    <SafeAreaView style={{ width: "100%", height: "100%" }}>
-      <View>
-        <Header title={"Minhas Reunioes"}></Header>
-      </View>
-      <Carousel vector={reunioes}></Carousel>
-      <FloatingActionButton></FloatingActionButton>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Header title={"Minhas Reunioes"} />
+      <Carousel
+        vector={reunioes}
+        onDelete={handleDelete}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
+      <FloatingActionButton />
     </SafeAreaView>
   );
 };

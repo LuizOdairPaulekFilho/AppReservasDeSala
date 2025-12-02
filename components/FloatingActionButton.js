@@ -7,7 +7,7 @@ const FloatingActionButton = () => {
     <View style={styles.container}>
       <Pressable
         style={styles.button}
-        onPress={() => navigation.navigate("Reservas")}
+        onPress={() => navigation.navigate("Cadastrar reserva")}
         android_ripple={{ color: "white", borderless: true }}
       >
         <Text style={styles.buttonText}>+</Text>
@@ -18,32 +18,30 @@ const FloatingActionButton = () => {
 
 const styles = StyleSheet.create({
   container: {
-    // Position the container absolutely within its parent view
+  
     position: "absolute",
-    bottom: 70, // Adjust as needed for desired vertical position
-    right: 20, // Adjust as needed for desired horizontal position
-    // Ensure the button is above other content
+    bottom: 70, 
+    right: 20, 
+  
     zIndex: 10,
   },
   button: {
-    backgroundColor: "#0353A4", // Button color
-    width: 80, // Circular shape requires equal width and height
+    backgroundColor: "#0353A4", 
+    width: 80, 
     height: 80,
-    borderRadius: 40, // Half of width/height to make it a perfect circle
-    justifyContent: "center", // Center content (text or icon) vertically
-    alignItems: "center", // Center content (text or icon) horizontally
-    // Add shadow for depth (iOS specific)
+    borderRadius: 40,
+    justifyContent: "center", 
+    alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 3,
-    // Add elevation for Android
     elevation: 5,
   },
   buttonText: {
     color: "white",
     fontSize: 30,
-    lineHeight: 30, // Helps with vertical centering of the '+' symbol
+    lineHeight: 30, 
   },
 });
 

@@ -10,7 +10,7 @@ export function Dropdown({ options, onSelect, selectedValue }) {
   }
 
   const handleSelect = (sala) => {
-    onSelect(sala); // Passa o objeto sala completo para o componente pai
+    onSelect(sala);
     setIsOpen(false);
   };
 

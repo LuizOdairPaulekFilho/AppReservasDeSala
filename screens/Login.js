@@ -23,6 +23,7 @@ export default function Login() {
       alert("Usuario e/ou senha invalidos");
     } else {
         await SecureStore.setItemAsync('userToken',data.token);
+       
         navigation.navigate("MinhasReunioes");
     }
   };

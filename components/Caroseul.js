@@ -1,13 +1,10 @@
-import { PanResponder, StyleSheet, View } from "react-native";
+import { FlatList, Dimensions } from "react-native";
 import CardCarousel from "./CardCaroseul";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import StatusReunionEnum from "../enums/StatusReunionEnum";
 
-export default function Carousel({ vector }) {
-  const [keySelected, setKeySelected] = useState(0);
-
-  const threshold = 50;
-  const swipeDone = useRef(false); // controla uma troca por gesto
+export default function Carousel({ vector, refreshControl, onDelete }) {
+  const [selected, setSelected] = useState(0);
 
   const getStatus = (status) => {
     const statusMap = {
@@ -19,73 +16,45 @@ export default function Carousel({ vector }) {
     return statusMap[status] || StatusReunionEnum.pending;
   };
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        return Math.abs(gestureState.dy) > 20;
-      },
-
-      onPanResponderGrant: () => {
-        swipeDone.current = false; // libera swipe no início do gesto
-      },
-
-      onPanResponderMove: (_, gestureState) => {
-        if (swipeDone.current) return; // já trocou neste gesto
-
-        if (gestureState.dy > threshold) {
-          swipe(-1); // sobe → item anterior
-          swipeDone.current = true;
-        } else if (gestureState.dy < -threshold) {
-          swipe(1); // desce → próximo item
-          swipeDone.current = true;
-        }
-      },
-
-      onPanResponderRelease: () => {
-        swipeDone.current = false; // libera próximo gesto
-      },
-    })
-  ).current;
-
-  const swipe = (direction) => {
-    setKeySelected((prev) => {
-      const next = prev + direction;
-      if (next < 0 || next >= vector.length) return prev;
-      return next;
-    });
-  };
+  const ITEM_HEIGHT = 220;
+  const SCREEN_HEIGHT = Dimensions.get("window").height;
+  const CENTER_OFFSET = (SCREEN_HEIGHT - ITEM_HEIGHT) / 2;
 
   return (
-    <View style={styles.carousel} {...panResponder.panHandlers}>
-      {vector.map((element, index) => {
-        const diff = Math.abs(index - keySelected);
-        const visible = index === keySelected;
-
-        // Valores fixos para evitar bugs com %
-        const width = 320 - diff * 40;
-        const height = 220 - diff * 25;
+    <FlatList
+      data={vector}
+      keyExtractor={(_, i) => i.toString()}
+      showsVerticalScrollIndicator={false}
+      decelerationRate="fast"
+      snapToInterval={ITEM_HEIGHT}
+      getItemLayout={(data, index) => ({
+        length: ITEM_HEIGHT,
+        offset: ITEM_HEIGHT * index,
+        index,
+      })}
+      renderItem={({ item, index }) => {
+        const isVisible = index === selected;
 
         return (
           <CardCarousel
-            key={index}
-            width={width}
-            height={height}
-            visible={visible}
-            setor={element.Setor.nome.toUpperCase()}
-            data={element.data_reuniao}
-            status={getStatus(element.status_reuniao)}
+            width={320}
+            height={200}
+            visible={isVisible}
+            setor={item.Setor.nome.toUpperCase()}
+            data={item.data_reuniao}
+            status={getStatus(item.status_reuniao)}
+            id={item.id}
+            onPress={() => setSelected(index)}
+            onDelete={() => onDelete(item.id)} 
           />
         );
-      })}
-    </View>
+      }}
+      contentContainerStyle={{
+        alignItems: "center",
+        paddingTop: 50,
+        paddingBottom: CENTER_OFFSET,
+      }}
+      refreshControl={refreshControl}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  carousel: {
-    width: "100%",
-    flex: 1,
-    paddingTop: 20,
-    alignItems: "center",
-  },
-});

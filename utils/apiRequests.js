@@ -26,3 +26,16 @@ export async function apiPost(endpoint,data) {
     const json = await requests.json()
     return json
 }
+
+export async function apiDelete(){
+    const requests = await fetch(process.env.EXPO_PUBLIC_API_URL+endpoint,{
+        method:"DELETE",
+        headers:{
+            "Authorization": `Bearer ${token}`,
+            'Content-Type':'application/json'
+        },
+        body:JSON.stringify(data)
+    })
+    const json = await requests.json()
+    return json
+}
