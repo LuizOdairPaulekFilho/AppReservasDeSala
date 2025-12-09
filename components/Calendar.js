@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   calendarHeader: {
     backgroundColor: "#FFF",
     width: "100%",
-    height: "5%",
+    height: 50,
     display: "flex",
     justifyContent: "space-around",
     alignItems: "center",

@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { apiGet } from "../utils/apiRequests";
 
 const ReservasGerais = () => {
-  const [reunioes, setReunioes] = useState([]);
+  const [reunioes, setReunioes] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
   const getAllReunions = async () => {
@@ -19,7 +19,6 @@ const ReservasGerais = () => {
   useEffect(() => {
     getAllReunions();
   }, []);
-
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -38,37 +37,27 @@ const ReservasGerais = () => {
         <Header title="Reservas Gerais" />
         <Calendar />
 
-        {reunioes.map((element) => {
-          const dataReuniao = new Date(element.data_reuniao);
-          const horarioFormatado = dataReuniao.toLocaleTimeString("pt-BR", {
-            month: "2-digit",
-            day: "2-digit",
-            year: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          const getStatus = (status) => {
-            const statusMap = {
-              cancelado: StatusReunionEnum.canceled,
-              "em andamento": StatusReunionEnum.inProgress,
-              pendente: StatusReunionEnum.pending,
-              finalizada: StatusReunionEnum.finished,
-            };
-            return statusMap[status] || StatusReunionEnum.pending;
-          };
-
-          return (
-            <CardReuniaoGeral
-              key={element.id}
-              andarNumber={element.Sala.andar}
-              horario={horarioFormatado}
-              setor={element.Setor.nome.toUpperCase()}
-              salaNumber={element.Sala.n_sala}
-              status={element.status_reuniao}
-            />
-          );
-        })}
+        {reunioes &&
+          reunioes.map((element) => {
+            const dataReuniao = new Date(element.data_reuniao);
+            const horarioFormatado = dataReuniao.toLocaleTimeString("pt-BR", {
+              month: "2-digit",
+              day: "2-digit",
+              year: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            return (
+              <CardReuniaoGeral
+                key={element.id}
+                andarNumber={element.Sala.andar}
+                horario={horarioFormatado}
+                setor={element.Setor.nome.toUpperCase()}
+                salaNumber={element.Sala.n_sala}
+                status={element.status_reuniao}
+              />
+            );
+          })}
       </ScrollView>
     </SafeAreaView>
   );

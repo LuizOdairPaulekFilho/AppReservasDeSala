@@ -11,7 +11,8 @@ const Reunioes = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchReunioes = async () => {
-    const dados = await apiGet("/api/reunioes");
+    const dados = await apiGet("/api/reunioes/user");
+    
     const pendentes = dados.filter((r) => r.status_reuniao === "pendente");
     setReunioes(pendentes);
   };

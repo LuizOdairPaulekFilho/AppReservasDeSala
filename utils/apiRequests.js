@@ -1,8 +1,9 @@
 import { getJWToken } from "./decodeJwt"
 
-const token = getJWToken() || 'token'
+
 
 export async function apiGet(endpoint) {
+    const token = getJWToken() || 'token'
     const requests = await fetch(process.env.EXPO_PUBLIC_API_URL+endpoint,{
         method:"GET",
         headers:{
@@ -15,6 +16,7 @@ export async function apiGet(endpoint) {
 }
 
 export async function apiPost(endpoint,data) {
+    const token = getJWToken() || 'token'
     const requests = await fetch(process.env.EXPO_PUBLIC_API_URL+endpoint,{
         method:"POST",
         headers:{
@@ -28,6 +30,7 @@ export async function apiPost(endpoint,data) {
 }
 
 export async function apiDelete(){
+    const token = getJWToken() || 'token'
     const requests = await fetch(process.env.EXPO_PUBLIC_API_URL+endpoint,{
         method:"DELETE",
         headers:{

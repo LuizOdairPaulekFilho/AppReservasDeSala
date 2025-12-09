@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 import {
   Image,
   Pressable,
@@ -13,20 +13,22 @@ import { apiPost } from "../utils/apiRequests";
 
 export default function Login() {
   const navigation = useNavigation();
-  const [cpf, setCpf] = useState("1234567");
-  const [password, setPassword] = useState("123456");
+  const [cpf, setCpf] = useState("");
+  const [password, setPassword] = useState("");
 
   const fetchLogin = async () => {
-    const data = await apiPost('/api/login',{cpf,password})
-
+    const data = await apiPost("/api/login", { cpf, password });
+    await SecureStore.deleteItemAsync("userToken");
+    console.log(SecureStore.getItem("userToken"))
     if (data.erro) {
       alert("Usuario e/ou senha invalidos");
     } else {
-        await SecureStore.setItemAsync('userToken',data.token);
-       
-        navigation.navigate("MinhasReunioes");
+      await SecureStore.setItemAsync("userToken", data.token);
+
+      navigation.navigate("MinhasReunioes");
     }
   };
+
 
   return (
     <View style={styles.container}>

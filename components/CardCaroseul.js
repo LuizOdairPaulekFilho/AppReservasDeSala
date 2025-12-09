@@ -17,6 +17,15 @@ export default function CardCarousel({
     onDelete();
   }
 
+  const dataReuniao = new Date(data);
+  const horarioFormatado = dataReuniao.toLocaleTimeString("pt-BR", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
     <Pressable
       onPress={onPress}
@@ -24,8 +33,7 @@ export default function CardCarousel({
     >
       <Text style={styles.label}>SETOR: {setor}</Text>
       <Text style={styles.label}>STATUS: {status}</Text>
-      <Text style={styles.label}>DATA: {data}</Text>
-
+      <Text style={styles.label}>DATA: {horarioFormatado}</Text>
       <Pressable style={styles.cancelar} onPress={handleDelete}>
         <Text style={styles.labelButton}>Cancelar</Text>
       </Pressable>

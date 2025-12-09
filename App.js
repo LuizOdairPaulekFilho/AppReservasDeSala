@@ -11,6 +11,7 @@ const RootStack = createDrawerNavigator({
       screen: Login,
       options: {
         headerShown: false,
+        unmountOnBlur: true,
         drawerItemStyle: { display: "none" },
       },
     },
@@ -18,18 +19,21 @@ const RootStack = createDrawerNavigator({
       screen: CadastrarReserva,
       options: {
         headerShown: false,
+        unmountOnBlur: true,
       },
     },
     MinhasReunioes: {
       screen: Reunioes,
       options: {
         headerShown: false,
+        unmountOnBlur: true,
       },
     },
     ReservasGerais: {
       screen: ReservasGerais,
       options: {
         headerShown: false,
+        unmountOnBlur: true,
       },
     },
   },
